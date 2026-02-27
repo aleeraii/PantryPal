@@ -2,7 +2,7 @@
   "expo": {
     "name": "PantryPal",
     "slug": "pantrypal",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
@@ -33,8 +33,8 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-      "backgroundColor": "#2C3531",
-      "dark": {
+          "backgroundColor": "#2C3531",
+          "dark": {
             "backgroundColor": "#2C3531"
           }
         }
