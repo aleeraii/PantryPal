@@ -8,7 +8,12 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "release": "standard-version",
+    "release:patch": "standard-version --release-as patch",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "postversion": "node scripts/sync-app-version.js"
   },
   "dependencies": {
     "@expo-google-fonts/montserrat": "^0.4.2",
@@ -45,6 +50,7 @@
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "standard-version": "^9.5.0",
     "typescript": "~5.9.2"
   },
   "private": true

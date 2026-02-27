@@ -87,3 +87,7 @@ Thumbs.db
 
 # Local configuration
 *.local
+
+# Node (root commitlint/husky tooling)
+node_modules/
+package-lock.json

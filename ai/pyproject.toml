@@ -1,0 +1,20 @@
+[project]
+name = "pantrypal-ai"
+version = "0.1.0"
+description = "PantryPal AI agents — Google ADK-powered recipe and pantry intelligence"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.bumpversion]
+current_version = "0.1.0"
+commit = false
+tag = false
+allow_dirty = true
+
+[[tool.bumpversion.files]]
+filename = "VERSION"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'

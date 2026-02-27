@@ -1,0 +1,22 @@
+[project]
+name = "pantrypal-backend"
+version = "1.0.0"
+description = "PantryPal FastAPI backend — inventory, recipes, meal planning, and AI integration"
+requires-python = ">=3.11"
+dependencies = [
+    "sqlalchemy>=2.0.0",
+]
+
+[tool.bumpversion]
+current_version = "1.0.0"
+commit = false
+tag = false
+allow_dirty = true
+
+[[tool.bumpversion.files]]
+filename = "VERSION"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'

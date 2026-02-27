@@ -1,0 +1,26 @@
+{
+  "name": "pantrypal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PantryPal monorepo — AI-powered pantry and recipe platform",
+  "scripts": {
+    "prepare": "husky",
+    "setup:python": "python3 -m venv .venv && .venv/bin/pip install bump2version git-cliff",
+    "release:mobile": "cd mobile && npm run release",
+    "release:mobile:patch": "cd mobile && npm run release:patch",
+    "release:mobile:minor": "cd mobile && npm run release:minor",
+    "release:mobile:major": "cd mobile && npm run release:major",
+    "release:backend:patch": "cd backend && ../.venv/bin/bump2version patch && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
+    "release:backend:minor": "cd backend && ../.venv/bin/bump2version minor && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
+    "release:backend:major": "cd backend && ../.venv/bin/bump2version major && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
+    "release:frontend:patch": "cd frontend && ../.venv/bin/bump2version patch && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
+    "release:frontend:minor": "cd frontend && ../.venv/bin/bump2version minor && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
+    "release:ai:patch": "cd ai && ../.venv/bin/bump2version patch && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
+    "release:ai:minor": "cd ai && ../.venv/bin/bump2version minor && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "husky": "^9.1.7"
+  }
+}
