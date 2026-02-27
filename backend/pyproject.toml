@@ -1,6 +1,6 @@
 [project]
 name = "pantrypal-backend"
-version = "1.1.0"
+version = "1.1.1"
 description = "PantryPal FastAPI backend — inventory, recipes, meal planning, and AI integration"
 requires-python = ">=3.11"
 dependencies = [
@@ -8,7 +8,7 @@ dependencies = [
 ]
 
 [tool.bumpversion]
-current_version = "1.1.0"
+current_version = "1.1.1"
 commit = false
 tag = false
 allow_dirty = true
