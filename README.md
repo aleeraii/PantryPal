@@ -273,7 +273,205 @@ The following items need to be added to the codebase:
 - [ ] `docs/architecture.md` — system architecture diagram
 - [ ] `docs/deployment.md` — production deployment guide
 - [ ] `CONTRIBUTING.md` — branching strategy, PR template, code style guide
-- [ ] `CHANGELOG.md` — version history
+- [x] `RELEASE.md` per sub-project — version history (auto-generated, see Versioning section above)
+
+---
+
+## Versioning & Release Workflow
+
+PantryPal uses [Conventional Commits](https://www.conventionalcommits.org/) enforced by **commitlint** + **Husky**, and per-sub-project semantic versioning managed by **standard-version** (mobile) and **bump-my-version** + **git-cliff** (backend, frontend, ai).
+
+Each sub-project is versioned independently and maintains its own `RELEASE.md` changelog.
+
+| Sub-project | Current version source | Changelog |
+|---|---|---|
+| `mobile` | `mobile/package.json` + `mobile/app.json` | [`mobile/RELEASE.md`](mobile/RELEASE.md) |
+| `backend` | `backend/VERSION` + `backend/pyproject.toml` | [`backend/RELEASE.md`](backend/RELEASE.md) |
+| `frontend` | `frontend/VERSION` + `frontend/pyproject.toml` | [`frontend/RELEASE.md`](frontend/RELEASE.md) |
+| `ai` | `ai/VERSION` + `ai/pyproject.toml` | [`ai/RELEASE.md`](ai/RELEASE.md) |
+
+---
+
+### New Developer Setup
+
+After cloning, run these once to activate commit linting and install Python release tools:
+
+```bash
+npm install              # installs husky + commitlint, activates the git commit-msg hook
+npm run setup:python     # creates .venv and installs bump-my-version + git-cliff
+cd mobile && npm install
+```
+
+---
+
+### How to Write Commit Messages
+
+Every commit **must** follow the Conventional Commits format or it will be **rejected** by the git hook:
+
+```
+<type>(<scope>): <short description>
+
+[optional body — explain the why, not the what]
+
+[optional footer — BREAKING CHANGE: describe what breaks]
+```
+
+**Allowed scopes** (maps to sub-projects):
+
+| Scope | Use for |
+|---|---|
+| `mobile` | React Native / Expo app changes |
+| `backend` | FastAPI, models, database, API routes |
+| `frontend` | Admin dashboard (React + Vite) |
+| `ai` | AI agents (Google ADK) |
+| `root` | Monorepo-level config, tooling |
+| `ci` | GitHub Actions workflows |
+| `deps` | Dependency updates across projects |
+
+**Allowed types and what they mean:**
+
+| Type | Semver impact | When to use |
+|---|---|---|
+| `feat` | Minor bump | A new feature visible to users or API consumers |
+| `fix` | Patch bump | A bug fix |
+| `perf` | Patch bump | A performance improvement |
+| `refactor` | No bump | Code restructuring with no behaviour change |
+| `docs` | No bump | Documentation only |
+| `test` | No bump | Adding or fixing tests |
+| `chore` | No bump | Build scripts, config, tooling |
+| `ci` | No bump | CI/CD pipeline changes |
+| `build` | No bump | Build system changes |
+| `revert` | Patch bump | Reverting a previous commit |
+
+**Breaking changes** (major bump) — append `!` after the scope or add a `BREAKING CHANGE:` footer:
+
+```
+feat(backend)!: redesign inventory API response shape
+
+BREAKING CHANGE: all /inventory endpoints now return items as a flat array instead of nested object
+```
+
+**Good examples:**
+
+```bash
+feat(mobile): add barcode scanner to pantry inventory screen
+fix(backend): correct JWT token expiry calculation
+perf(mobile): lazy-load recipe images with expo-image
+refactor(backend): extract auth logic into core/security.py
+chore(deps): bump expo from 54.0.33 to 54.1.0
+ci(root): add backend lint step to PR workflow
+docs(ai): document recipe generator agent inputs and outputs
+feat(backend)!: redesign inventory API  # triggers major bump
+```
+
+**Bad examples (will be rejected):**
+
+```bash
+fixed stuff                    # no type, no scope
+Update README                  # no type, no scope
+feat: add login                # missing scope
+feat(payments): add stripe     # "payments" is not an allowed scope
+Feat(mobile): Add Login Screen # capitalised type and subject
+```
+
+---
+
+### How to Create a Release
+
+Releases are run manually when you are ready to publish a version. They bump the version number, regenerate the `RELEASE.md` changelog, commit the changes, and create a git tag.
+
+#### Mobile (React Native / Expo)
+
+```bash
+# From the repo root:
+npm run release:mobile:patch   # 1.0.2 → 1.0.3  (bug fixes only)
+npm run release:mobile:minor   # 1.0.2 → 1.1.0  (new features)
+npm run release:mobile:major   # 1.0.2 → 2.0.0  (breaking changes)
+
+# Or from inside mobile/:
+cd mobile
+npm run release:patch
+npm run release:minor
+npm run release:major
+```
+
+What happens automatically:
+1. `standard-version` reads all commits since the last `mobile-v*` tag
+2. Bumps the version in `mobile/package.json`
+3. Bumps the version in `mobile/app.json` (`expo.version`) — Expo OTA and store builds read this
+4. Writes `mobile/RELEASE.md` with Features / Bug Fixes / Performance sections
+5. Creates a git commit (`chore(release): 1.0.3`) and a tag (`mobile-v1.0.3`)
+
+#### Backend / Frontend / AI (Python projects)
+
+```bash
+# From the repo root:
+npm run release:backend:patch   # 1.1.1 → 1.1.2
+npm run release:backend:minor   # 1.1.1 → 1.2.0
+npm run release:backend:major   # 1.1.1 → 2.0.0
+
+npm run release:frontend:patch
+npm run release:frontend:minor
+
+npm run release:ai:patch
+npm run release:ai:minor
+```
+
+What happens automatically:
+1. `bump-my-version` bumps the version in both `VERSION` (plain text) and `pyproject.toml`
+2. `git-cliff` scans the full git history and filters to commits scoped to that project only (e.g. only `fix(backend):...` commits appear in the backend changelog)
+3. Writes `<project>/RELEASE.md` with versioned sections grouped by Features / Bug Fixes
+4. Creates a release commit (`chore(backend): release v1.1.2`) and a tag (`backend-v1.1.2`)
+
+#### After any release
+
+Push the commits and tags to the remote:
+
+```bash
+git push --follow-tags origin main
+```
+
+---
+
+### What Goes Into a Release
+
+A release is automatically built from your commit history. Only commits with visible types (`feat`, `fix`, `perf`, `refactor`, `revert`) appear in `RELEASE.md`. Hidden types (`docs`, `chore`, `test`, `ci`, `build`, `style`) are excluded from the changelog.
+
+**Patch release** (`1.0.0 → 1.0.1`) — triggered by `fix`, `perf`, or `revert` commits:
+```markdown
+## [1.0.1] - 2026-02-28
+### Bug Fixes
+- Correct JWT token expiry calculation (abc1234)
+- Handle null pantry items in meal plan generation (def5678)
+```
+
+**Minor release** (`1.0.0 → 1.1.0`) — triggered by any `feat` commit:
+```markdown
+## [1.1.0] - 2026-02-28
+### Features
+- Add recipe recommendation endpoint (abc1234)
+- Add barcode scanner to pantry inventory screen (def5678)
+### Bug Fixes
+- Correct inventory item quantity validation (ghi9012)
+```
+
+**Major release** (`1.0.0 → 2.0.0`) — triggered by a breaking change (`!` or `BREAKING CHANGE:` footer):
+```markdown
+## [2.0.0] - 2026-02-28
+### Features
+- [BREAKING] Redesign inventory API response shape (abc1234)
+```
+
+---
+
+### Why This Workflow Matters
+
+- **Consistency** — every commit is machine-readable, making it possible to auto-generate accurate changelogs with zero manual effort
+- **Traceability** — each release entry links to the exact commit that introduced the change
+- **Independent versioning** — mobile, backend, frontend, and AI can each be at different versions and released on their own cadence without interfering with each other
+- **Build version sync** — the mobile `app.json` version is always in sync with `package.json`, so Expo OTA updates and App Store submissions always carry the correct version; the backend exposes its `VERSION` file on the `/health` endpoint
+- **Scoped changelogs** — the backend `RELEASE.md` only ever shows backend commits; mobile only shows mobile commits — no noise from unrelated sub-projects
+- **Git tags** — every release creates a tag (`mobile-v1.0.3`, `backend-v1.1.2`) making it trivial to diff between releases or roll back
 
 ---
 
