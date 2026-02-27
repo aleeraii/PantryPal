@@ -10,13 +10,13 @@
     "release:mobile:patch": "cd mobile && npm run release:patch",
     "release:mobile:minor": "cd mobile && npm run release:minor",
     "release:mobile:major": "cd mobile && npm run release:major",
-    "release:backend:patch": "cd backend && ../.venv/bin/bump2version patch && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
-    "release:backend:minor": "cd backend && ../.venv/bin/bump2version minor && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
-    "release:backend:major": "cd backend && ../.venv/bin/bump2version major && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
-    "release:frontend:patch": "cd frontend && ../.venv/bin/bump2version patch && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
-    "release:frontend:minor": "cd frontend && ../.venv/bin/bump2version minor && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
-    "release:ai:patch": "cd ai && ../.venv/bin/bump2version patch && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md",
-    "release:ai:minor": "cd ai && ../.venv/bin/bump2version minor && ../.venv/bin/git-cliff --config cliff.toml -o RELEASE.md"
+    "release:backend:patch": "node scripts/release-python.js backend patch",
+    "release:backend:minor": "node scripts/release-python.js backend minor",
+    "release:backend:major": "node scripts/release-python.js backend major",
+    "release:frontend:patch": "node scripts/release-python.js frontend patch",
+    "release:frontend:minor": "node scripts/release-python.js frontend minor",
+    "release:ai:patch": "node scripts/release-python.js ai patch",
+    "release:ai:minor": "node scripts/release-python.js ai minor"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
